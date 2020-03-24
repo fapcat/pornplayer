@@ -1,5 +1,5 @@
 const express = require('express')
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const store = require('./lib/store-manager');
 const vs = require('./lib/video-streamer');
