@@ -25,6 +25,8 @@
     let video_el = document.getElementById('video_player');
     let settings_div = document.getElementById('settings');
     let ph = null;
+    let selected_list_item = 0;
+    let list_items = [];
 
     video_el.autoplay = false;
     video_el.volume = 0; 
@@ -50,7 +52,7 @@
 
     function toggle_aspect_ratio() {
         if (current_section == "player") {
-            let aspect_ratios = ['cover', 'contain', 'fill', 'none'];
+            let aspect_ratios = ['contain', 'cover', 'fill', 'none'];
             
             let i = aspect_ratios.lastIndexOf(getComputedStyle(video_el).objectFit) + 1;
             if (i >= aspect_ratios.length) i = 0;
@@ -67,12 +69,17 @@
             file_item.classList.add('file_item');
             file_item.setAttribute('data-id', f);
             file_item.innerText = files[f];
-            file_item.addEventListener('click', event => {
+            file_item.addEventListener('click', function () {
+                listItems[selected_list_item].classList.remove("selected");
                 play_video('specific', f)
+                selected_list_item = f;
                 switch_section('player');
             })
             files_div.appendChild(file_item);
         }
+
+        listItems = document.querySelectorAll("#files_list li");
+        listItems[selected_list_item].classList.add("selected");
     }
 
     switch_section(current_section);
@@ -172,6 +179,7 @@
         }
 
         document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
+
         video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
         video_el.load();
     }
@@ -197,6 +205,8 @@
         video_el.currentTime = curtime ;
     };
 
+
+
     addEvent(document, "keydown", function (e) {
         e = e || window.event;
         
@@ -204,21 +214,52 @@
             case 83: // key: s
                 switch_section('settings');
                 break;
+            case 13: // enter key
+                if (current_section == "files") {
+                    play_video('specific', selected_list_item)
+                    switch_section('player');
+                }
+                break;
             case 27: // escape
+                if (current_section == "settings") {
+                    switch_section(previous_section);
+                }
+                switch_section('home');
                 if (current_section == "player") {
+                    
                     video_el.volume = 0; 
                     video_el.style.display = "none"
                     video_el.pause();
                     let progress = document.getElementById('progress_bar');
                     progress.style.display = 'none';
                 }
-
+                break;
+            case 38: // key: up arrow
                 if (current_section == "files") {
-                    switch_section('home');
-                }
+                    // Remove the highlighting from the previous element
+                    listItems[selected_list_item].classList.remove("selected");
+                    
+                    selected_list_item = selected_list_item > 0 ? --selected_list_item : 0;     // Decrease the counter      
+                    listItems[selected_list_item].classList.add("selected"); // Highlight the new element
 
-                if (current_section == "settings") {
-                    switch_section(previous_section);
+                    document.getElementById('files_list').scrollTop = listItems[selected_list_item].offsetTop;
+
+                    console.log('Selected item top', listItems[selected_list_item].offsetTop);
+                    console.log('Scroll top', document.getElementById('files_list').scrollTop);
+                }
+                break;
+            case 40: // key: down arrow
+                if (current_section == "files") {
+                    // Remove the highlighting from the previous element
+                    listItems[selected_list_item].classList.remove("selected");
+                    
+                    selected_list_item = selected_list_item < listItems.length-1 ? ++selected_list_item : listItems.length-1; // Increase counter 
+                    listItems[selected_list_item].classList.add("selected");       // Highlight the new element
+
+                    document.getElementById('files_list').scrollTop = listItems[selected_list_item].offsetTop;
+
+                    console.log('Selected item top', listItems[selected_list_item].offsetTop);
+                    console.log('Scroll top', document.getElementById('files_list').scrollTop);
                 }
                 break;
             case 49: // key: 1

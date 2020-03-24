@@ -1,0 +1,33 @@
+{
+  "name": "pornplayer",
+  "version": "0.0.1",
+  "description": "Re-discover porn",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fapcat/pornplayer.git"
+  },
+  "keywords": [
+    "porn",
+    "player",
+    "video",
+    "collection",
+    "library"
+  ],
+  "author": "FapCat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fapcat/pornplayer/issues"
+  },
+  "homepage": "https://github.com/fapcat/pornplayer#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs-extra": "^9.0.0"
+  }
+}
