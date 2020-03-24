@@ -108,7 +108,7 @@ video {
     background-color: rgba(206, 117, 0, 0.712);
     height: 100%;
     width: 0;
-    transition: width 0.2s;
+    transition: width 0.1s;
 }
 
 #home {
@@ -154,14 +154,13 @@ kbd {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    overflow-y: scroll;
     height: 100%;
+    overflow-y: scroll;
   }
 
   #files_list li {
     font-size: 1.2rem;
     color: white;
-    margin: 5px;
     padding: 5px;
     background-color: #1B263B;
     cursor: pointer;
@@ -169,4 +168,10 @@ kbd {
 
   #files_list li.active {
     background-color: peru;
+    color: white;
+  }
+
+  #files_list li.selected {
+    background-color: lightgoldenrodyellow;
+    color: #1B263B;
   }
