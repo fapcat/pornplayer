@@ -146,8 +146,10 @@ kbd {
   }
 
   #files {
+      position: relative;
       width: 100%;
-      height: 100vh;
+      overflow-y: scroll;
+      margin: 20px;
   }
 
   #files_list {
@@ -155,20 +157,19 @@ kbd {
     padding: 0;
     margin: 0;
     height: 100%;
-    overflow-y: scroll;
   }
 
   #files_list li {
-    font-size: 1.2rem;
+    display: block;
+    padding: 15px;
     color: white;
-    padding: 5px;
     background-color: #1B263B;
     cursor: pointer;
   }
 
   #files_list li.active {
-    background-color: peru;
-    color: white;
+    background-color: peru !important;
+    color: white !important;
   }
 
   #files_list li.selected {
