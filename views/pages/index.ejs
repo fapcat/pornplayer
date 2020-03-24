@@ -47,6 +47,12 @@
                 if (s == sname) el.style.display = 'block';
                 else el.style.display = 'none';
             }
+
+            if (sname == "files") {
+                window.setTimeout(function() {
+                    document.getElementById('files').scrollTop = document.querySelector('#files li.selected').offsetTop;
+                }, 0);
+            }
         }
     }
 
@@ -71,6 +77,8 @@
             file_item.innerText = files[f];
             file_item.addEventListener('click', function () {
                 listItems[selected_list_item].classList.remove("selected");
+                listItems[f].classList.add("selected");
+                listItems[f].classList.add("active");
                 play_video('specific', f)
                 selected_list_item = f;
                 switch_section('player');
@@ -79,7 +87,7 @@
         }
 
         listItems = document.querySelectorAll("#files_list li");
-        listItems[selected_list_item].classList.add("selected");
+        listItems[0].classList.add("selected");
     }
 
     switch_section(current_section);
@@ -173,12 +181,12 @@
 
         console.log(`Playing video ${get_from_history().id + 1} of ${files.length} (${get_from_history().path})`);
 
-        let allElements = Array.from(document.querySelectorAll('#files_list li.active'))
-        for (let element of allElements) {
-            element.classList.remove('active')
-        }
+        // let allElements = Array.from(document.querySelectorAll('#files_list li.active'))
+        // for (let element of allElements) {
+        //     element.classList.remove('active')
+        // }
 
-        document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
+        // document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
 
         video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
         video_el.load();
@@ -216,6 +224,7 @@
                 break;
             case 13: // enter key
                 if (current_section == "files") {
+                    listItems[selected_list_item].classList.add("active");
                     play_video('specific', selected_list_item)
                     switch_section('player');
                 }
@@ -234,32 +243,43 @@
                     progress.style.display = 'none';
                 }
                 break;
+            // case 34: // key: pagedown
+            //     if (current_section == "files" && selected_list_item < listItems.length) {
+            //         i = selected_list_item;
+            //         while((listItems[i].offsetTop + listItems[i].offsetHeight) <= (document.getElementById('files').offsetHeight + document.getElementById('files').scrollTop)) {
+            //             if (i == listItems.length - 1) break;
+            //             else i++;
+            //         }
+                    
+            //         window.setTimeout(function() {
+            //             listItems[selected_list_item].remove("selected");
+            //             listItems[i].scrollIntoView();
+            //             listItems[i].classList.add("selected"); // Highlight the new element
+            //             selected_list_item = i
+            //         }, 0);
+            //     }
+            //     break;
             case 38: // key: up arrow
                 if (current_section == "files") {
                     // Remove the highlighting from the previous element
                     listItems[selected_list_item].classList.remove("selected");
-                    
                     selected_list_item = selected_list_item > 0 ? --selected_list_item : 0;     // Decrease the counter      
-                    listItems[selected_list_item].classList.add("selected"); // Highlight the new element
+                    window.setTimeout(function() {
+                        listItems[selected_list_item].scrollIntoView();
+                        listItems[selected_list_item].classList.add("selected"); // Highlight the new element
+                    }, 0);
 
-                    document.getElementById('files_list').scrollTop = listItems[selected_list_item].offsetTop;
-
-                    console.log('Selected item top', listItems[selected_list_item].offsetTop);
-                    console.log('Scroll top', document.getElementById('files_list').scrollTop);
                 }
                 break;
             case 40: // key: down arrow
                 if (current_section == "files") {
                     // Remove the highlighting from the previous element
                     listItems[selected_list_item].classList.remove("selected");
-                    
                     selected_list_item = selected_list_item < listItems.length-1 ? ++selected_list_item : listItems.length-1; // Increase counter 
-                    listItems[selected_list_item].classList.add("selected");       // Highlight the new element
-
-                    document.getElementById('files_list').scrollTop = listItems[selected_list_item].offsetTop;
-
-                    console.log('Selected item top', listItems[selected_list_item].offsetTop);
-                    console.log('Scroll top', document.getElementById('files_list').scrollTop);
+                    window.setTimeout(function() {
+                        listItems[selected_list_item].scrollIntoView();
+                        listItems[selected_list_item].classList.add("selected");       // Highlight the new element
+                    }, 0);
                 }
                 break;
             case 49: // key: 1
