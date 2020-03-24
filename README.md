@@ -15,6 +15,7 @@ What things you need to install the software and how to install them
 ### Installing
 
 - Clone this git repository
+- Run `npm install` to install dependecies
 - Rename config.example.json to config.json
 - Edit config.json and add one or more folders where your videos are located
 
