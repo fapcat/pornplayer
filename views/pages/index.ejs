@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>###</title>
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <style>
+
+    </style> 
+</head>
+<body>
+    <div id="content">
+        <%- include('../partials/settings') %> 
+        <%- include('../partials/home') %> 
+        <%- include('../partials/files') %> 
+        <%- include('../partials/player') %> 
+    </div>
+
+<script>
+    let current_section = previous_section = 'home';
+    let history = [];
+    let files = [];
+    let video_el = document.getElementById('video_player');
+    let settings_div = document.getElementById('settings');
+    let ph = null;
+
+    video_el.autoplay = false;
+    video_el.volume = 0; 
+
+    function switch_section(sname) {
+        let sections = ['home', 'files', 'player']
+
+        if (current_section != sname) previous_section = current_section;
+        current_section = sname;
+
+        if (sname == 'settings') {
+            settings_div.classList.add('settings_visible');
+        } else {
+            settings_div.classList.remove('settings_visible');
+
+            for (let s of sections) {
+                let el = document.getElementById(s);
+                if (s == sname) el.style.display = 'block';
+                else el.style.display = 'none';
+            }
+        }
+    }
+
+    function toggle_aspect_ratio() {
+        if (current_section == "player") {
+            let aspect_ratios = ['cover', 'contain', 'fill', 'none'];
+            
+            let i = aspect_ratios.lastIndexOf(getComputedStyle(video_el).objectFit) + 1;
+            if (i >= aspect_ratios.length) i = 0;
+
+            video_el.style.objectFit = aspect_ratios[i];
+        }
+    }
+
+    function update_files_list() {
+        let files_div = document.getElementById('files_list');
+
+        for (f of files) {
+            file_item = document.createElement('li');
+            file_item.classList.add('file_item');
+            file_item.innerText = f;
+            files_div.appendChild(file_item);
+        }
+    }
+
+    switch_section(current_section);
+
+
+
+    video_el.addEventListener('loadedmetadata', () => { 
+        play();
+    });
+
+    video_el.addEventListener('error', () => { 
+        console.log(`Error ${video_el.error.code} with file ${get_from_history().path}; details: ${video_el.error.message}`);
+        play_video('next');
+    });
+
+    video_el.addEventListener('ended', () => { 
+        play_video('next');
+    });
+
+    video_el.addEventListener('timeupdate', () => {
+        let progress = document.getElementById('progress');
+        progress.style.width = `${(video_el.currentTime / video_el.duration) * 100}%`
+    });
+
+    function add_to_history(id, time) {
+        history.push(
+            {
+                'id': id,
+                'time': time,
+                'path': files[id]
+            }
+        );
+    }
+
+    function progress_hide() {
+        let progress = document.getElementById('progress_bar');
+        progress.style.opacity = 0;
+        progress.style.bottom = `-30px`;
+    }
+
+    function progress_delayed_hide() {
+        clearTimeout(ph);
+        ph = setTimeout(progress_hide, 1500);
+    }
+
+    function progress_show() {
+        let progress = document.getElementById('progress_bar');
+        progress.style.display = 'block';
+        progress.style.opacity = 100;
+        progress.style.bottom = `20px`;
+        progress_delayed_hide();
+    }
+
+    function update_history(time = 'rnd') {
+        history[history.length - 1].time = time;
+    }
+
+    function get_from_history(back = 0) {
+        return history[history.length - (back + 1)]
+    }
+
+    function play_video(method = 'random', custom_start = 0) {
+        if (video_el.currentTime) update_history(video_el.currentTime);
+        video_el.style.display = 'block';
+        progress_show();
+
+        switch(method) {
+            case 'first':
+                add_to_history(0, 'rnd');
+                break;
+            case 'next':
+                if (history.length == 0) add_to_history(0, 'rnd');
+                else add_to_history((get_from_history().id == files.length - 1) ? 0 : get_from_history().id + 1, 'rnd');
+                break;
+            case 'previous':
+                if (history.length == 0) add_to_history(files.length - 1, 'rnd');
+                else add_to_history((get_from_history().id == 0) ? files.length - 1 : get_from_history().id - 1, 'rnd');
+                break;
+            case 'random':
+                add_to_history(Math.floor(Math.random()*files.length), 'rnd');
+                break;
+            case 'last':
+                if (history.length == 0) add_to_history(Math.floor(Math.random()*files.length), 'rnd');
+                history.push(history.splice(history.length - 2, 1)[0]);
+                break;
+            default:
+        }
+
+        console.log(`Playing video ${get_from_history().id + 1} of ${files.length} (${get_from_history().path})`);
+
+        video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
+        video_el.load();
+    }
+
+    function scan() {
+        return fetch('/files')
+        .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            files = data.files;
+            if (files.length > 0) update_files_list();
+            document.getElementById('num_files').innerText = `${files.length}${(data.scan_status == 'scanning') ? ' (Still scanning)' : ''}`;
+            return data;
+          });
+    }
+
+    function play() {
+        video_el.style.display = 'block'
+        video_el.play();
+        let vidfile = get_from_history();
+        let curtime = (vidfile.time == 'rnd') ? Math.floor(Math.random() * video_el.duration + 30) : vidfile.time;
+        video_el.currentTime = curtime ;
+    };
+
+    addEvent(document, "keydown", function (e) {
+        e = e || window.event;
+        
+        switch(e.keyCode) {
+            case 83: // key: s
+                switch_section('settings');
+                break;
+            case 27: // escape
+                if (current_section == "player") {
+                    video_el.volume = 0; 
+                    video_el.style.display = "none"
+                    video_el.pause();
+                    let progress = document.getElementById('progress_bar');
+                    progress.style.display = 'none';
+                }
+
+                if (current_section == "settings") {
+                    switch_section(previous_section);
+                }
+                break;
+            case 49: // key: 1
+                switch_section('home');
+                break;
+            case 50: // key: 2
+                switch_section('files');
+                break;
+            case 51: // key: 3
+                switch_section('player');
+                break;
+            case 65: // key: a (aspect ratio)
+                toggle_aspect_ratio();
+                break;
+            case 66: // key: b (play previous in sequence)
+            if (files.length > 0) {
+                    switch_section('player');
+                    play_video('previous');
+                }
+                break;
+            case 72: // key: h (play random)
+                if (files.length > 0) {
+                    switch_section('player');
+                    play_video('random');
+                }
+                break;
+            case 74: // key: j (rewind)
+                if (current_section == "player") {
+                    progress_show();
+                    if (video_el.currentTime >= (video_el.duration * .05)) {
+                        video_el.currentTime = video_el.currentTime - (video_el.duration * .05);
+                    } else {
+                        video_el.currentTime = 0;
+                    }
+                }
+                break;
+            case 75: // key: k (fast forward)
+                if (current_section == "player") {
+                    progress_show();
+                    if (video_el.currentTime < (video_el.duration - (video_el.duration * .05))) {
+                        video_el.currentTime = video_el.currentTime + (video_el.duration * .05);
+                    }
+                }
+                break;
+            case 76: // key: l (play last viewed)
+                if (files.length > 0) {
+                    switch_section('player');
+                    play_video('last');
+                }
+                break;
+            case 78: // key: n (play next in sequence)
+                if (files.length > 0) {
+                    switch_section('player');
+                    play_video('next');
+                }
+                break;
+            default:
+                console.log(`You pressed ${e.keyCode}`);
+        }
+    });
+
+    function addEvent(element, eventName, callback) {
+        if (element.addEventListener) {
+            element.addEventListener(eventName, callback, false);
+        } else if (element.attachEvent) {
+            element.attachEvent("on" + eventName, callback);
+        } else {
+            element["on" + eventName] = callback;
+        }
+    }
+
+    scan();
+
+</script> 
+</body>
+</html>
