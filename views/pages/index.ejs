@@ -62,10 +62,15 @@
     function update_files_list() {
         let files_div = document.getElementById('files_list');
 
-        for (f of files) {
+        for (let f = 0; f < files.length; f++) {
             file_item = document.createElement('li');
             file_item.classList.add('file_item');
-            file_item.innerText = f;
+            file_item.setAttribute('data-id', f);
+            file_item.innerText = files[f];
+            file_item.addEventListener('click', event => {
+                play_video('specific', f)
+                switch_section('player');
+            })
             files_div.appendChild(file_item);
         }
     }
@@ -129,7 +134,7 @@
         return history[history.length - (back + 1)]
     }
 
-    function play_video(method = 'random', custom_start = 0) {
+    function play_video(method = 'random', custom_vid = 0, custom_start = 0) {
         if (video_el.currentTime) update_history(video_el.currentTime);
         video_el.style.display = 'block';
         progress_show();
@@ -137,6 +142,9 @@
         switch(method) {
             case 'first':
                 add_to_history(0, 'rnd');
+                break;
+            case 'specific':
+                add_to_history(custom_vid, 'rnd');
                 break;
             case 'next':
                 if (history.length == 0) add_to_history(0, 'rnd');
