@@ -181,12 +181,20 @@
 
         console.log(`Playing video ${get_from_history().id + 1} of ${files.length} (${get_from_history().path})`);
 
-        // let allElements = Array.from(document.querySelectorAll('#files_list li.active'))
-        // for (let element of allElements) {
-        //     element.classList.remove('active')
-        // }
+        let allElements = Array.from(document.querySelectorAll('#files_list li.active'))
+        for (let element of allElements) {
+            element.classList.remove('active')
+        }
 
-        // document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
+        let allsElements = Array.from(document.querySelectorAll('#files_list li.selected'))
+        for (let element of allsElements) {
+            element.classList.remove('selected')
+        }
+
+        document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
+        document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('selected');
+
+        selected_list_item = get_from_history().id;
 
         video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
         video_el.load();
@@ -233,15 +241,18 @@
                 if (current_section == "settings") {
                     switch_section(previous_section);
                 }
-                switch_section('home');
+                
                 if (current_section == "player") {
                     
                     video_el.volume = 0; 
-                    video_el.style.display = "none"
                     video_el.pause();
+                    video_el.style.display = "none"
+                    
                     let progress = document.getElementById('progress_bar');
                     progress.style.display = 'none';
                 }
+
+                switch_section('home');
                 break;
             // case 34: // key: pagedown
             //     if (current_section == "files" && selected_list_item < listItems.length) {
