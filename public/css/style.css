@@ -166,3 +166,7 @@ kbd {
     background-color: #1B263B;
     cursor: pointer;
   }
+
+  #files_list li.active {
+    background-color: peru;
+  }
