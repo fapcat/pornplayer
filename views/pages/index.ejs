@@ -166,6 +166,12 @@
 
         console.log(`Playing video ${get_from_history().id + 1} of ${files.length} (${get_from_history().path})`);
 
+        let allElements = Array.from(document.querySelectorAll('#files_list li.active'))
+        for (let element of allElements) {
+            element.classList.remove('active')
+        }
+
+        document.querySelector(`[data-id='${get_from_history().id}']`).classList.add('active');
         video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
         video_el.load();
     }
@@ -205,6 +211,10 @@
                     video_el.pause();
                     let progress = document.getElementById('progress_bar');
                     progress.style.display = 'none';
+                }
+
+                if (current_section == "files") {
+                    switch_section('home');
                 }
 
                 if (current_section == "settings") {
