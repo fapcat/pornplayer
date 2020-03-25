@@ -103,7 +103,8 @@ video {
     opacity: 0;
     transition: opacity 0.3s, bottom 0.3s;
     display: flex; 
-    flex-direction: column
+    flex-direction: column;
+    overflow: hidden;
 }
 
 #progress_bar {
@@ -191,5 +192,5 @@ kbd {
   }
 
   #info {
-    padding: 4px; width: 100%; background-color: rgba(0, 0, 0, 0.3); color: white
+    padding: 4px; width: 100%; background-color: rgba(0, 0, 0, 0.3); color: white;
   }
