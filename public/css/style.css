@@ -102,6 +102,8 @@ video {
     padding: 1px;
     opacity: 0;
     transition: opacity 0.3s, bottom 0.3s;
+    display: flex; 
+    flex-direction: column
 }
 
 #progress_bar {
@@ -181,4 +183,8 @@ kbd {
   #files_list li.selected {
     background-color: lightgoldenrodyellow;
     color: #1B263B;
+  }
+
+  #info {
+    padding: 4px; width: 100%; background-color: rgba(0, 0, 0, 0.3); color: white
   }
