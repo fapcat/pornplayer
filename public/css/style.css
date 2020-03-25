@@ -26,6 +26,13 @@ html, body {
     transition: left 0.3s;
 }
 
+#settings {
+    overflow-y: auto;
+    height: 100vh;
+    position: absolute;
+    left: -33%;
+}
+
 .settings_visible {
     left: 0px !important;
 }
@@ -50,12 +57,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-#settings {
-    overflow-y: auto;
-    height: 100vh;
-    position: absolute;
-    left: -33%;
-}
+
 
 #settings_menu {
     width: 95%;
