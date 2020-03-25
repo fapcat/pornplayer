@@ -47,6 +47,8 @@ function toggle_aspect_ratio() {
     if (i >= aspect_ratios.length) i = 0;
 
     video_el.style.objectFit = aspect_ratios[i];
+    postData('/config', { "aspect_ratio": aspect_ratios[i] })
+    .then((data) => {});
   }
 }
 
@@ -176,6 +178,16 @@ function scan() {
     });
 }
 
+function config() {
+  return fetch("/config")
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      return data;
+    });
+}
+
 function play() {
   video_el.style.display = "block";
   video_el.play();
@@ -211,9 +223,9 @@ addEvent(document, "keydown", function(e) {
       if (current_section == "settings") {
         switch_section(previous_section);
       } else {
+        video_el.volume = 0;
+        video_el.pause();
         if (current_section == "player") {
-          video_el.volume = 0;
-          video_el.pause();
           video_el.style.display = "none";
 
           let progress = document.getElementById("progress_bar");
@@ -271,6 +283,11 @@ addEvent(document, "keydown", function(e) {
         }, 0);
       }
       break;
+    case 48: // key: 0
+      if (current_section == "player") {
+        if (video_el.volume < 1) video_el.volume = Math.round((video_el.volume + 0.1)*10)/10;
+      }
+      break;
     case 49: // key: 1
       switch_section("home");
       break;
@@ -280,6 +297,11 @@ addEvent(document, "keydown", function(e) {
     case 51: // key: 3
       switch_section("player");
       break;
+    case 57: // key: 9
+      if (current_section == "player") {
+        if (video_el.volume > 0) video_el.volume = Math.round((video_el.volume - 0.1)*10)/10;
+      }
+      break;
     case 65: // key: a (aspect ratio)
       toggle_aspect_ratio();
       break;
@@ -287,6 +309,11 @@ addEvent(document, "keydown", function(e) {
       if (files.length > 0) {
         switch_section("player");
         play_video("previous");
+      }
+      break;
+    case 70: // key: f (toggle fullscreen)
+    if (current_section == "player") {
+        toggleFullscreen()
       }
       break;
     case 72: // key: h (play random)
@@ -343,5 +370,42 @@ function addEvent(element, eventName, callback) {
   }
 }
 
+async function postData(url = '', data = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+    headers: {
+      'Content-Type': 'application/json'
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer', // no-referrer, *client
+    body: JSON.stringify(data) // body data type must match "Content-Type" header
+  });
+  return await response.json(); // parses JSON response into native JavaScript objects
+}
+
+function toggleFullscreen(event) {
+  var element = document.body;
+
+	if (event instanceof HTMLElement) {
+		element = event;
+	}
+
+	var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
+
+	element.requestFullScreen = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || function () { return false; };
+	document.cancelFullScreen = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || function () { return false; };
+
+	isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
+}
+
 switch_section(current_section);
+config().then((data) => {
+  video_el.style.objectFit = data.aspect_ratio || 'contain';
+});
+
 scan();
