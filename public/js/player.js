@@ -352,9 +352,9 @@ addEvent(document, "keydown", function(e) {
         play_video("next");
       }
       break;
-    case 83: // key: s
-      switch_section("settings");
-      break;
+    // case 83: // key: s
+    //   switch_section("settings");
+    //   break;
     default:
       console.log(`You pressed ${e.keyCode}`);
   }

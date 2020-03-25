@@ -35,8 +35,7 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "/**/cache.json",
-      "/**/config.json"
+      "/**/cache.json"
     ]
   }
 }
