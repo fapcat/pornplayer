@@ -9,7 +9,7 @@ const fm = require('./lib/file-manager');
 const { log } = require('./lib/log-manager');
 
 const app = express()
-const port = 3001;
+const port = config.get().port || 3001;
 
 store.set('files', []);
 store.set('scan_status', "idle");
