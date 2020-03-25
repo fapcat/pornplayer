@@ -21,9 +21,9 @@ function switch_section(sname) {
   current_section = sname;
 
   if (sname == "settings") {
-    settings_div.classList.add("settings_visible");
+    // settings_div.classList.add("settings_visible");
   } else {
-    settings_div.classList.remove("settings_visible");
+    // settings_div.classList.remove("settings_visible");
 
     for (let s of sections) {
       let el = document.getElementById(s);
