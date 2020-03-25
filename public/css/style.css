@@ -93,17 +93,21 @@ video {
     flex: 1 1 0%;
 }
 
-#progress_bar {
+#info_bar {
     position: absolute;
     bottom: -30px;
     left: 20px;
     right: 20px;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.322);
     z-index: 9999;
     padding: 1px;
     opacity: 0;
     transition: opacity 0.3s, bottom 0.3s;
+}
+
+#progress_bar {
+    height: 12px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.322);
 }
 
 #progress {
