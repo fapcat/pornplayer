@@ -91,18 +91,18 @@ video_el.addEventListener("timeupdate", () => {
 });
 
 function progress_hide() {
-    let progress = document.getElementById("progress_bar");
+    let progress = document.getElementById("info_bar");
     progress.style.opacity = 0;
     progress.style.bottom = `-30px`;
 }
 
 function progress_delayed_hide() {
     clearTimeout(ph);
-    ph = setTimeout(progress_hide, 1500);
+    ph = setTimeout(progress_hide, 2500);
 }
 
 function progress_show() {
-    let progress = document.getElementById("progress_bar");
+    let progress = document.getElementById("info_bar");
     progress.style.display = "block";
     progress.style.opacity = 100;
     progress.style.bottom = `20px`;
@@ -162,6 +162,7 @@ function play_video(method = "random", custom_vid = 0, custom_start = 0) {
   video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
   video_el.load();
 
+  document.getElementById('info').innerHTML = get_from_history().path;
   progress_show();
 }
 
@@ -228,7 +229,7 @@ addEvent(document, "keydown", function(e) {
         if (current_section == "player") {
           video_el.style.display = "none";
 
-          let progress = document.getElementById("progress_bar");
+          let progress = document.getElementById("info_bar");
           progress.style.display = "none";
         }
 
