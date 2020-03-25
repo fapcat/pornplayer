@@ -158,6 +158,11 @@ kbd {
       width: 100%;
       overflow-y: scroll;
       margin: 20px;
+      display: none;
+  }
+
+  #player {
+      display: none;
   }
 
   #files_list {
