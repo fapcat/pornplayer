@@ -303,7 +303,7 @@ addEvent(document, "keydown", function(e) {
         if (video_el.volume > 0) video_el.volume = Math.round((video_el.volume - 0.1)*10)/10;
       }
       break;
-      case 66: // key: b (play previous in sequence)
+    case 66: // key: b (play previous in sequence)
       if (files.length > 0) {
         switch_section("player");
         play_video("previous");
@@ -318,6 +318,11 @@ addEvent(document, "keydown", function(e) {
       if (files.length > 0) {
         switch_section("player");
         play_video("random");
+      }
+      break;
+      case 73: // key: i (show info)
+      if (current_section == "player") {
+        progress_show();
       }
       break;
       case 74: // key: j (rewind)
