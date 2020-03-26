@@ -193,7 +193,7 @@ function play() {
   video_el.style.display = "block";
   video_el.play();
   let vidfile = get_from_history();
-  let curtime = vidfile.time == "rnd" ? Math.floor(Math.random() * video_el.duration + 30) : vidfile.time;
+  let curtime = vidfile.time == "rnd" ? Math.floor(Math.random() * video_el.duration) : vidfile.time;
   video_el.currentTime = curtime;
 }
 
@@ -303,27 +303,24 @@ addEvent(document, "keydown", function(e) {
         if (video_el.volume > 0) video_el.volume = Math.round((video_el.volume - 0.1)*10)/10;
       }
       break;
-    case 65: // key: a (aspect ratio)
-      toggle_aspect_ratio();
-      break;
-    case 66: // key: b (play previous in sequence)
+      case 66: // key: b (play previous in sequence)
       if (files.length > 0) {
         switch_section("player");
         play_video("previous");
       }
       break;
-    case 70: // key: f (toggle fullscreen)
-    if (current_section == "player") {
+      case 70: // key: f (toggle fullscreen)
+      if (current_section == "player") {
         toggleFullscreen()
       }
       break;
-    case 72: // key: h (play random)
+      case 72: // key: h (play random)
       if (files.length > 0) {
         switch_section("player");
         play_video("random");
       }
       break;
-    case 74: // key: j (rewind)
+      case 74: // key: j (rewind)
       if (current_section == "player") {
         progress_show();
         if (video_el.currentTime >= video_el.duration * 0.05) {
@@ -333,7 +330,7 @@ addEvent(document, "keydown", function(e) {
         }
       }
       break;
-    case 75: // key: k (fast forward)
+      case 75: // key: k (fast forward)
       if (current_section == "player") {
         progress_show();
         if (video_el.currentTime < video_el.duration - video_el.duration * 0.05) {
@@ -341,27 +338,30 @@ addEvent(document, "keydown", function(e) {
         }
       }
       break;
-    case 76: // key: l (play last viewed)
+      case 76: // key: l (play last viewed)
       if (files.length > 0) {
         switch_section("player");
         play_video("last");
       }
       break;
-    case 78: // key: n (play next in sequence)
+      case 78: // key: n (play next in sequence)
       if (files.length > 0) {
         switch_section("player");
         play_video("next");
       }
       break;
-    // case 83: // key: s
-    //   switch_section("settings");
-    //   break;
-    default:
-      console.log(`You pressed ${e.keyCode}`);
-  }
-});
-
-function addEvent(element, eventName, callback) {
+      // case 83: // key: s
+      //   switch_section("settings");
+      //   break;
+      case 82: // key: r (aspect ratio)
+        toggle_aspect_ratio();
+        break;
+      default:
+        console.log(`You pressed ${e.keyCode}`);
+      }
+    });
+    
+    function addEvent(element, eventName, callback) {
   if (element.addEventListener) {
     element.addEventListener(eventName, callback, false);
   } else if (element.attachEvent) {
