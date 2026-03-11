@@ -403,6 +403,12 @@ async function postData(url = '', data = {}) {
   return await response.json(); // parses JSON response into native JavaScript objects
 }
 
+function cancelFullscreen() {
+  var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
+  document.cancelFullScreen = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || function () { return false; };
+  if (isFullscreen) document.cancelFullScreen();
+}
+
 function toggleFullscreen(event) {
   var element = document.body;
 
