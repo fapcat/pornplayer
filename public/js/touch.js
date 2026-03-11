@@ -50,10 +50,41 @@ mc.on("panstart", (e) => {
     console.log(panInfo);
 });
 
+function executeHorizontalSwipe() {
+    if ((panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) && panInfo.direction === "right") {
+        panInfo.action = "play_random";
+        if (files.length > 0) play_video("random");
+    }
+    if ((panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) && panInfo.direction === "left") {
+        panInfo.action = "play_last";
+        if (files.length > 0) play_video("last");
+    }
+}
+
+mc.on("pancancel", (e) => {
+    // On mobile, OS back gesture fires touchcancel instead of touchend.
+    // Still process horizontal swipes from top half if distance was sufficient.
+    if (panInfo.swipeIntent && !panInfo.action) {
+        executeHorizontalSwipe();
+    }
+    seeking = false;
+    adjusting_volume = false;
+});
+
 mc.on("panend", (e) => {
     console.log(e, Math.abs(e.velocity));
     if (e.type === "panend") {
+        // Top-half horizontal swipes: use distance threshold only (no velocity required)
+        // so mobile users don't need to swipe fast.
         if (
+            panInfo.action != "seeking" &&
+            e.distance > 40 &&
+            (panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) &&
+            (panInfo.direction === "left" || panInfo.direction === "right")
+        ) {
+            panInfo.gestureType = "swipe";
+            executeHorizontalSwipe();
+        } else if (
             Math.abs(e.velocity) > 0.3 &&
             e.distance > 10 &&
             panInfo.action != "seeking"
@@ -75,22 +106,6 @@ mc.on("panend", (e) => {
             ) {
                 sendEventToBackend("x");
                 console.log('x');
-            }
-
-            if (
-                (panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) &&
-                panInfo.direction === "right"
-            ) {
-                panInfo.action = "play_random";
-                if (files.length > 0) play_video("random");
-            }
-
-            if (
-                (panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) &&
-                panInfo.direction === "left"
-            ) {
-                panInfo.action = "play_last";
-                if (files.length > 0) play_video("last");
             }
         } else {
             panInfo.gestureType = "pan";
@@ -115,6 +130,14 @@ mc.on("panend", (e) => {
 
 mc.on("pan", (e) => {
     panInfo.direction = directions[e.offsetDirection];
+
+    // Track swipe intent for top-half horizontal pans (used by pancancel handler)
+    if (
+        (panInfo.startQuadrant == 1 || panInfo.startQuadrant == 2) &&
+        (panInfo.direction === "left" || panInfo.direction === "right")
+    ) {
+        panInfo.swipeIntent = panInfo.direction;
+    }
 
     if (
         panInfo.startQuadrant > 2 &&
