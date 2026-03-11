@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>###</title>
+    <link rel="shortcut icon" href="/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <style>
+      .grid-container {
+        margin: 20px;
+        width: 300px;
+        display: grid;
+        grid-gap: 3px;
+        grid-template-columns: repeat(3, 1fr);
+        margin: 0 auto;
+      }
+
+      .grid-item {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .grid-button {
+        background-color: #555;
+        color: #fff;
+        font-size: 2em;
+      }
+
+      .grid-button:active {
+        background-color: lightslategray;
+      }
+
+      #pin-representation {
+        color: #fff;
+        font-size: 2em;
+        text-align: center;
+        height: 30px;
+        margin: 50px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <form id="pin" action="/pin" method="post">
+        <input type="hidden" name="pin" id="pin_input" />
+      </form>
+
+      <div id="pin-representation"></div>
+
+      <div class="grid-container">
+        <div class="grid-item grid-button">1</div>
+        <div class="grid-item grid-button">2</div>
+        <div class="grid-item grid-button">3</div>
+        <div class="grid-item grid-button">4</div>
+        <div class="grid-item grid-button">5</div>
+        <div class="grid-item grid-button">6</div>
+        <div class="grid-item grid-button">7</div>
+        <div class="grid-item grid-button">8</div>
+        <div class="grid-item grid-button">9</div>
+        <div class="grid-item grid-button">C</div>
+        <div class="grid-item grid-button">0</div>
+        <div class="grid-item grid-button">OK</div>
+      </div>
+    </div>
+    <script>
+      let buttons = document.getElementsByClassName("grid-item");
+
+      for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+          if (this.innerHTML == "OK") {
+            document.getElementById("pin").submit();
+          } else {
+            let pin_field = document.getElementById("pin_input");
+            pin_field.value += this.innerHTML;
+            if (this.innerHTML == "C")
+              document.getElementById("pin_input").value = "";
+
+            console.log(pin_field.value.length);
+
+            document.getElementById("pin-representation").innerText = "";
+
+            for (let dots = 0; dots < pin_field.value.length; dots++)
+              document.getElementById("pin-representation").innerText += "*";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

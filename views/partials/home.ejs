@@ -1,18 +1,35 @@
 <div id="home" class="f1">
-    <p style="margin-bottom: 50px">Hey there! We have found <span id="num_files"></span> scenes</p>
+  <div class="welcome">
+    <p style="margin-bottom: 10px;">Aloha! We have found <span id="num_files"></span> scenes</p>
+    <p style="margin-bottom: 50px;">
+      <input type="text" id="search_string" style="padding: 10px; margin-bottom: 5px"><br />
+      <button id="search">Search</button>
+      <button id="all">All</button>
+    </p>
     <p>Press <kbd>H</kbd> to start a random scene</p>
     <p>Press <kbd>N</kbd> to start the next scene in the sequence</p>
     <p>Press <kbd>L</kbd> to return to the last watched</p>
     <p>Press <kbd>B</kbd> to start the previous scene in the sequence</p>
     <p>Press <kbd>J</kbd> to rewind</p>
     <p>Press <kbd>K</kbd> to fast forward</p>
-    <p>Press <kbd>1</kbd> to go to this screen</p>
-    <p>Press <kbd>2</kbd> to go to the files list</p>
-    <p>Press <kbd>3</kbd> to go to the player</p>
-    <p>Press <kbd>R</kbd> to cycle through the aspect ratios</p>
+    <p>Press <kbd id="key_home">1</kbd> to go to this screen</p>
+    <p>Press <kbd id="key_files">2</kbd> to go to the files list</p>
+    <p>Press <kbd id="key_player">3</kbd> to go to the player</p>
+    <p>Press <kbd id="key_aspect_ratio">R</kbd> to change aspect ratio <span id="current_aspect_ratio"></span></p>
     <p>Press <kbd>9</kbd> to lower the audio volume</p>
     <p>Press <kbd>0</kbd> to increase the audio volume</p>
     <p>Press <kbd>F</kbd> to toggle full screen mode</p>
     <p>Press <kbd>I</kbd> to display the video info</p>
-    <p style="margin-top: 50px">Press <kbd>ESC</kbd> when your mom enters the room</p>
+    <p>Press <kbd>ESC</kbd> when your mom enters the room</p>
+    <p style="margin-top: 50px;">Click <kbd id="key_mobile">HERE</kbd> for mobile mode</p>
+  </div>
+
+  <div id="playlist" class="f1">
+      <ul id="playlists">
+      </ul>
+  </div>
+  <div id="remote_playlist" class="f1">
+      <ul id="remote_playlists">
+      </ul>
+  </div>
 </div>
