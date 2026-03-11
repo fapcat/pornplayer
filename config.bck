@@ -1,0 +1,21 @@
+{
+  "folders": [
+    "/mnt/elements12/X",
+    "/mnt/elements12/Recovery",
+    "/mnt/elements12/RecoverRecuva",
+    "/mnt/elements12/files"
+  ],
+  "excludes": [
+    "final.space",
+    "DCIM",
+    "Philippines",
+    "Altered.Carbon.S02E08.WEBRip.x264-ION10",
+    "Color Climax"
+  ],
+  "port": 3001,
+  "force_scan_at_startup": false,
+  "aspect_ratio": "contain",
+  "mute": true,
+  "file_provider": "local",
+  "pin": "085292"
+}

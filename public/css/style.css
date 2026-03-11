@@ -1,195 +1,334 @@
-html, body {
-    background-color: black;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+/* noto-sans-regular - latin */
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/noto-sans-v9-latin-regular.eot"); /* IE9 Compat Modes */
+  src: local("Noto Sans"), local("NotoSans"),
+    url("../fonts/noto-sans-v9-latin-regular.eot?#iefix")
+      format("embedded-opentype"),
+    /* IE6-IE8 */ url("../fonts/noto-sans-v9-latin-regular.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */ url("../fonts/noto-sans-v9-latin-regular.woff")
+      format("woff"),
+    /* Modern Browsers */ url("../fonts/noto-sans-v9-latin-regular.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("../fonts/noto-sans-v9-latin-regular.svg#NotoSans") format("svg"); /* Legacy iOS */
+}
+/* noto-sans-italic - latin */
+@font-face {
+  font-family: "Noto Sans";
+  font-style: italic;
+  font-weight: 400;
+  src: url("../fonts/noto-sans-v9-latin-italic.eot"); /* IE9 Compat Modes */
+  src: local("Noto Sans Italic"), local("NotoSans-Italic"),
+    url("../fonts/noto-sans-v9-latin-italic.eot?#iefix")
+      format("embedded-opentype"),
+    /* IE6-IE8 */ url("../fonts/noto-sans-v9-latin-italic.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */ url("../fonts/noto-sans-v9-latin-italic.woff")
+      format("woff"),
+    /* Modern Browsers */ url("../fonts/noto-sans-v9-latin-italic.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("../fonts/noto-sans-v9-latin-italic.svg#NotoSans") format("svg"); /* Legacy iOS */
+}
+/* noto-sans-700 - latin */
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/noto-sans-v9-latin-700.eot"); /* IE9 Compat Modes */
+  src: local("Noto Sans Bold"), local("NotoSans-Bold"),
+    url("../fonts/noto-sans-v9-latin-700.eot?#iefix")
+      format("embedded-opentype"),
+    /* IE6-IE8 */ url("../fonts/noto-sans-v9-latin-700.woff2") format("woff2"),
+    /* Super Modern Browsers */ url("../fonts/noto-sans-v9-latin-700.woff")
+      format("woff"),
+    /* Modern Browsers */ url("../fonts/noto-sans-v9-latin-700.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("../fonts/noto-sans-v9-latin-700.svg#NotoSans") format("svg"); /* Legacy iOS */
+}
+/* noto-sans-700italic - latin */
+@font-face {
+  font-family: "Noto Sans";
+  font-style: italic;
+  font-weight: 700;
+  src: url("../fonts/noto-sans-v9-latin-700italic.eot"); /* IE9 Compat Modes */
+  src: local("Noto Sans Bold Italic"), local("NotoSans-BoldItalic"),
+    url("../fonts/noto-sans-v9-latin-700italic.eot?#iefix")
+      format("embedded-opentype"),
+    /* IE6-IE8 */ url("../fonts/noto-sans-v9-latin-700italic.woff2")
+      format("woff2"),
+    /* Super Modern Browsers */
+      url("../fonts/noto-sans-v9-latin-700italic.woff") format("woff"),
+    /* Modern Browsers */ url("../fonts/noto-sans-v9-latin-700italic.ttf")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("../fonts/noto-sans-v9-latin-700italic.svg#NotoSans") format("svg"); /* Legacy iOS */
+}
+
+html,
+body {
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
 }
 
 #content {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #415A77;
-    display: flex;
-    flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
 }
 
 #settings {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 33%;
-    min-width: 400px;
-    background-color: rgba(3, 11, 19, 0.95);
-    transition: left 0.3s;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 33%;
+  min-width: 400px;
+  background-color: rgba(3, 11, 19, 0.95);
+  transition: left 0.3s;
 }
 
 #settings {
-    overflow-y: auto;
-    height: 100vh;
-    position: absolute;
-    left: -33%;
+  overflow-y: auto;
+  height: 100vh;
+  position: absolute;
+  left: -33%;
 }
 
 .settings_visible {
-    left: 0px !important;
+  left: 0px !important;
 }
 
 .width33 {
-    width: 33%;
+  width: 33%;
 }
 
 .width0 {
-    width: 0;
+  width: 0;
 }
 
 .visible {
-    display: block;
+  display: block;
 }
 
 .invisible {
-    display: none;
+  display: none;
 }
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-
 
 #settings_menu {
-    width: 95%;
-    margin: 20px auto 20px auto;
-    color: #eee;
-    font-size: 2rem;
+  width: 95%;
+  margin: 20px auto 20px auto;
+  color: #eee;
+  font-size: 2rem;
 }
 
 .settings_menu_item {
-    display: flex;
-    justify-content: space-between;
-    background-color: #1B263B;
-    padding: 0.8rem;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #1b263b;
+  padding: 0.8rem;
+  margin-bottom: 20px;
 }
 
 .settings_menu_item:hover {
-    background-color: rgb(223, 219, 163);
-    color: #0D1B2A;
+  background-color: rgb(223, 219, 163);
+  color: #0d1b2a;
 }
 
 #player {
-    width: 100%;
+  width: 100%;
 }
 
 video {
-    object-fit: contain;
-    width: 100%;
-    height: 100vh;
+  object-fit: contain;
+  width: 100%;
+  height: 100vh;
 }
 
 .f1 {
-    flex: 1 1 0%;
+  flex: 1 1 0%;
 }
 
 #info_bar {
-    position: absolute;
-    bottom: -30px;
-    left: 20px;
-    right: 20px;
-    z-index: 9999;
-    padding: 1px;
-    opacity: 0;
-    transition: opacity 0.3s, bottom 0.3s;
-    display: flex; 
-    flex-direction: column;
-    overflow: hidden;
+  position: absolute;
+  bottom: -30px;
+  left: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 1px;
+  opacity: 0;
+  transition: opacity 0.3s, bottom 0.3s;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 #progress_bar {
-    height: 12px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.322);
+  height: 12px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.322);
 }
 
 #progress {
-    background-color: rgba(206, 117, 0, 0.712);
-    height: 100%;
-    width: 0;
-    transition: width 0.1s;
+  background-color: rgba(206, 117, 0, 0.712);
+  height: 100%;
+  width: 0;
+  transition: width 0.1s;
 }
 
 #home {
-    margin: 20px;
-    color: white;
-    font-size: 1.2rem;
+  color: white;
+  font-size: 1.2rem;
+  overflow-y: auto;
+}
+
+#home .welcome {
+  margin: 10px;
 }
 
 kbd {
-    color: #444444;
-    font-family: 'Courier New', Courier, monospace; /* "Lucida Grande", Lucida, Verdana, sans-serif; */
-    font-weight: bold;
-    font-style: normal;
-    text-align: center;
-    line-height: 1em;
-    text-shadow: 0 1px 0 #fff;
-    display: inline;
-    padding: .2em .55em;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #bbb;
-    background-color: #f7f7f7;
-    background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(rgba(0, 0, 0, 0.1)), to(rgba(0, 0, 0, 0)));
-    background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    background-image: linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-    background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1a000000', endColorstr='#00000000', GradientType=0);
-    box-shadow: 0px 2px 0 #bbbbbb, 0 3px 1px #999999, 0 3px 0 #bbbbbb, inset 0 1px 1px #ffffff, inset 0 -1px 3px #cccccc;
-  }
+  color: #444444;
+  font-family: "Courier New", Courier, monospace; /* "Lucida Grande", Lucida, Verdana, sans-serif; */
+  font-weight: bold;
+  font-style: normal;
+  text-align: center;
+  line-height: 1em;
+  text-shadow: 0 1px 0 #fff;
+  display: inline;
+  padding: 0.2em 0.55em;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #bbb;
+  background-color: #f7f7f7;
+  background-image: -moz-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
+  background-image: -webkit-gradient(
+    linear,
+    0 0,
+    0 100%,
+    from(rgba(0, 0, 0, 0.1)),
+    to(rgba(0, 0, 0, 0))
+  );
+  background-image: -webkit-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
+  background-image: -o-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
+  background-image: linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1a000000', endColorstr='#00000000', GradientType=0);
+  box-shadow: 0px 2px 0 #bbbbbb, 0 3px 1px #999999, 0 3px 0 #bbbbbb,
+    inset 0 1px 1px #ffffff, inset 0 -1px 3px #cccccc;
+}
 
-  #files {
-      position: relative;
-      width: 100%;
-      overflow-y: scroll;
-      display: none;
-  }
+#files {
+  position: relative;
+  width: 100%;
+  overflow-y: scroll;
+  display: none;
+}
 
-  #player {
-      display: none;
-  }
+#player {
+  display: none;
+}
 
-  #files_list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    height: 100%;
-  }
+#files_list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
 
-  #files_list li {
-    display: block;
-    padding: 15px;
-    color: white;
-    background-color: #1B263B;
-    cursor: pointer;
-  }
+#files_list li {
+  display: block;
+  padding: 15px;
+  color: white;
+  background-color: #1b263b;
+  cursor: pointer;
+}
 
-  #files_list li.active {
-    background-color: peru !important;
-    color: white !important;
-  }
+#files_list li.active {
+  background-color: peru !important;
+  color: white !important;
+}
 
-  #files_list li.selected {
-    background-color: lightgoldenrodyellow;
-    color: #1B263B;
-  }
+#files_list li.selected {
+  background-color: lightgoldenrodyellow;
+  color: #1b263b;
+}
 
-  #info {
-    padding: 4px; width: 100%; background-color: rgba(0, 0, 0, 0.3); color: white;
-  }
+#info {
+  padding: 4px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+#video_player::-internal-media-controls-overlay-cast-button {
+  display: none;
+}
+
+.volume {
+  display: none;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  font-size: 20vh;
+  font-weight: bolder;
+  text-align: center;
+  color: white;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  z-index: 999;
+  transition: display ease 2s;
+}
+
+#new {
+  height: 200px;
+  width: 200px;
+}
+
+#touch_menu {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.touch {
+  margin-left: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

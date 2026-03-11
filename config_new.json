@@ -1,0 +1,29 @@
+{
+  "folders": [
+    "/mnt/vcs/vc1/Z",
+    "/mnt/vcs/vc1/W",
+    "/mnt/vcs/vc1/V",
+    "/mnt/vcs/vc1/X",
+    "/mnt/vcs/vc1/P",
+    "/mnt/vcs/vc3/PHPremium",
+    "/mnt/vcs/vc1/2019",
+    "/mnt/vcs/vc1/New",
+    "/mnt/vcs/vc1/Download",
+    "/mnt/vcs/vc1/JimSlip",
+    "/mnt/vcs/vc2/Download",
+    "/mnt/vcs/vc3/New"
+  ],
+  "excludes": [
+    "final.space",
+    "DCIM",
+    "Philippines",
+    "Altered.Carbon.S02E08.WEBRip.x264-ION10",
+    "Color Climax"
+  ],
+  "port": 3001,
+  "force_scan_at_startup": false,
+  "aspect_ratio": "contain",
+  "mute": true,
+  "file_provider": "local",
+  "pin": "085292"
+}

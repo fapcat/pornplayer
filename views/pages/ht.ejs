@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>#HT#</title>
+    <link rel="shortcut icon" href="/img/favicon.ico" />
+    <style>
+        #hdiv {
+            background: green;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="hdiv">
+
+    </div>
+    <script src="/js/hammer.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    let gestureArea = document.getElementById('hdiv');
+
+    let directions = [];
+    directions[2] = 'left'; 
+    directions[4] = 'right'; 
+    directions[16] = 'down'; 
+    directions[8] = 'up'; 
+
+    let panInfo = {};
+
+    let mc = new Hammer.Manager(gestureArea);
+
+    let singlepan = new Hammer.Pan({ 
+        event: 'pan',
+        direction: Hammer.DIRECTION_ALL, 
+        threshold: 5,
+        pointers: 1
+    });
+
+    let multipan = new Hammer.Pan({ 
+        event: 'multipan',
+        direction: Hammer.DIRECTION_ALL, 
+        threshold: 5,
+        pointers: 2
+    });
+
+    mc.add([singlepan, multipan]);
+    singlepan.recognizeWith(multipan);
+    multipan.requireFailure(singlepan);
+
+    mc.on('panstart multipanstart', e => {
+        panInfo = {};
+
+        if (e.center.x <= gestureArea.offsetWidth / 2) {
+            // left side
+            if (e.center.y <= gestureArea.offsetHeight / 2) {
+                panInfo.startQuadrant = 1;
+            } else {
+                panInfo.startQuadrant = 4;
+            }
+        } else {
+            if (e.center.y <= gestureArea.offsetHeight / 2) {
+                panInfo.startQuadrant = 2;
+            } else {
+                panInfo.startQuadrant = 3;
+            }
+        }
+
+        console.log(panInfo);
+    });
+
+    mc.on('panend multipanend', e => {
+        console.log(e, Math.abs(e.velocity));
+        if (e.type === 'panend') {
+            if (Math.abs(e.velocity) > 0.3 && e.distance > 10 && panInfo.action != 'seeking') {
+                panInfo.gestureType = 'swipe';
+
+                if ((panInfo.startQuadrant == 2 || panInfo.startQuadrant == 3) && panInfo.direction === 'down') {
+                    panInfo.action = 'home';
+                }
+            } else {
+                panInfo.gestureType = 'pan';
+            }
+        }
+
+        if (e.type === 'multipanend') {
+            if (Math.abs(e.velocity) > 0.3 && e.distance > 10 && panInfo.action != 'seeking') {
+                panInfo.gestureType = 'multiswipe';
+            } else {
+                panInfo.gestureType = 'multipan';
+            }
+        }
+
+        console.log(panInfo);
+    });
+
+    mc.on('pan', e => {
+        panInfo.direction = directions[e.offsetDirection];
+
+        if (panInfo.startQuadrant > 2 && ((panInfo.direction === 'left') || (panInfo.direction === 'right'))) {
+            panInfo.action = 'seeking';
+        } 
+
+        console.log(panInfo);
+    });
+    </script>
+
+  </body>
+</html>

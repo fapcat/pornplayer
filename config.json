@@ -1,0 +1,29 @@
+{
+  "folders": [
+    "/media/veracrypt1/Z",
+    "/media/veracrypt1/W",
+    "/media/veracrypt1/V",
+    "/media/veracrypt1/X",
+    "/media/veracrypt1/P",
+    "/media/veracrypt3/PHPremium",
+    "/media/veracrypt1/2019",
+    "/media/veracrypt1/New",
+    "/media/veracrypt1/Download",
+    "/media/veracrypt1/JimSlip",
+    "/media/veracrypt2/Download",
+    "/media/veracrypt3/New"
+  ],
+  "excludes": [
+    "final.space",
+    "DCIM",
+    "Philippines",
+    "Altered.Carbon.S02E08.WEBRip.x264-ION10",
+    "Color Climax"
+  ],
+  "port": 3001,
+  "force_scan_at_startup": false,
+  "aspect_ratio": "contain",
+  "mute": true,
+  "file_provider": "local",
+  "pin": "085292"
+}
