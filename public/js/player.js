@@ -155,7 +155,7 @@ function play_video(method = "random", custom_vid = 0, custom_start = 0) {
   select_list_item(get_from_history().id, true);
 
   video_el.setAttribute('data-video-path', encodeURI(get_from_history().path));
-  video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
+  video_el.src = `/video/?f=${encodeURIComponent(get_from_history().path)}`;
   video_el.load();
 
   document.getElementById('info').innerHTML = get_from_history().path;
