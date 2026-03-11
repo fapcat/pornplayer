@@ -25,5 +25,7 @@
   "aspect_ratio": "contain",
   "mute": true,
   "file_provider": "local",
-  "pin": "085292"
+  "pin": "085292",
+  "last_playlist_type": "remote",
+  "last_playlist_id": 1
 }

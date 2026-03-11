@@ -27,7 +27,7 @@ function sendEventToBackend(eventType) {
 
     const currentTime = video.currentTime;
 
-    fetch('http://192.168.1.19:8008/api/v1/video-engagement/event', {
+    fetch('http://10.30.1.177:8008/api/v1/video-engagement/event', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -165,7 +165,7 @@ function initVideoDebuggingAndTracking(video) {
         console.table(watchedSegments);
 
         try {
-            const response = await fetch('http://192.168.1.19:8008/api/v1/video-engagement-pp', {
+            const response = await fetch('http://10.30.1.177:8008/api/v1/video-engagement-pp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
