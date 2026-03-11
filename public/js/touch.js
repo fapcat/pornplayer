@@ -96,6 +96,8 @@ mc.on("panend", (e) => {
                 panInfo.direction === "down"
             ) {
                 panInfo.action = "home";
+                video_el.volume = 0;
+                video_el.pause();
                 switch_section("home");
                 cancelFullscreen();
             }
