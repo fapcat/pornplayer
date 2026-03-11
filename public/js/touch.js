@@ -5,8 +5,6 @@ let adjusting_volume = false;
 let curr_volume = 0;
 let new_volume = 0;
 
-let notification = document.getElementById("notification");
-
 let gestureArea = document.getElementById("player");
 
 let directions = [];
@@ -139,33 +137,6 @@ mc.on("pan", (e) => {
     console.log(panInfo);
 });
 
-document.getElementById("key_mobile").addEventListener("click", () => {
-    if (files.length > 0) {
-        switch_section("player");
-        play_video("random");
-    }
-});
-
-document.getElementById("key_home").addEventListener("click", () => {
-    switch_section("home");
-});
-
-document.getElementById("key_files").addEventListener("click", () => {
-    if (files.length > 0) {
-        switch_section("files");
-    }
-});
-
-document.getElementById("key_player").addEventListener("click", () => {
-    if (files.length > 0) {
-        switch_section("player");
-        play_video("random");
-    }
-});
-
-document.getElementById("key_aspect_ratio").addEventListener("click", () => {
-    toggle_aspect_ratio();
-});
 
 let tap = new Hammer.Tap({event: "singletap"});
 let doubletap = new Hammer.Tap({event: "doubletap", taps: 2});
