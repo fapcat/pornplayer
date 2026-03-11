@@ -4,11 +4,14 @@ let files = [];
 let video_el = document.getElementById("video_player");
 let settings_div = document.getElementById("settings");
 let file_items = [];
-let ph = null;
+let ph = null; // progress timer
+let nt = null; // notification timer
 let selected_list_item = null;
 let last_selected_item = null;
 let active_list_item = null;
 let list_items = [];
+let audioEnabled = false;
+let notification = document.getElementById("notification");
 
 video_el.autoplay = false;
 video_el.volume = 0;
@@ -37,6 +40,15 @@ function switch_section(sname) {
       }, 0);
     }
   }
+}
+
+function show_volume_notification(text) {
+  notification.textContent = text;
+  notification.style.display = "block";
+  clearTimeout(nt);
+  nt = setTimeout(() => {
+    notification.style.display = "none";
+  }, 1000);
 }
 
 function toggle_aspect_ratio() {
@@ -213,6 +225,15 @@ function select_list_item(id, make_active = false) {
 addEvent(document, "keydown", function(e) {
   e = e || window.event;
 
+  // 0-9: seek to position in player
+  if (current_section == "player" && e.keyCode >= 48 && e.keyCode <= 57) {
+    e.preventDefault();
+    let x = e.keyCode - 48;
+    video_el.currentTime = (video_el.duration * x) / 10;
+    progress_show();
+    return;
+  }
+
   switch (e.keyCode) {
     case 13: // enter key
       if (current_section == "files") {
@@ -263,30 +284,28 @@ addEvent(document, "keydown", function(e) {
             }, 0);
         }
         break;
-    case 38: // key: up arrow
+    case 38: // up: navigate files list / volume up in player
       if (current_section == "files") {
-        // Remove the highlighting from the previous element
-        
-        let new_item = selected_list_item > 0 ? selected_list_item - 1 : 0; // Decrease the counter
+        let new_item = selected_list_item > 0 ? selected_list_item - 1 : 0;
         window.setTimeout(function() {
           file_items[new_item].scrollIntoView();
-          select_list_item(new_item)
+          select_list_item(new_item);
         }, 0);
+      } else if (current_section == "player" && audioEnabled) {
+        video_el.volume = Math.min(1, Math.round((video_el.volume + 0.1) * 10) / 10);
+        show_volume_notification(Math.round(video_el.volume * 100) + "%");
       }
       break;
-    case 40: // key: down arrow
+    case 40: // down: navigate files list / volume down in player
       if (current_section == "files") {
-        // Remove the highlighting from the previous element
-        let new_item = selected_list_item < file_items.length - 1 ? selected_list_item + 1 : file_items.length - 1; // Increase counter
+        let new_item = selected_list_item < file_items.length - 1 ? selected_list_item + 1 : file_items.length - 1;
         window.setTimeout(function() {
           file_items[new_item].scrollIntoView();
-          select_list_item(new_item)
+          select_list_item(new_item);
         }, 0);
-      }
-      break;
-    case 48: // key: 0
-      if (current_section == "player") {
-        if (video_el.volume < 1) video_el.volume = Math.round((video_el.volume + 0.1)*10)/10;
+      } else if (current_section == "player" && audioEnabled) {
+        video_el.volume = Math.max(0, Math.round((video_el.volume - 0.1) * 10) / 10);
+        show_volume_notification(Math.round(video_el.volume * 100) + "%");
       }
       break;
     case 49: // key: 1
@@ -297,11 +316,6 @@ addEvent(document, "keydown", function(e) {
       break;
     case 51: // key: 3
       switch_section("player");
-      break;
-    case 57: // key: 9
-      if (current_section == "player") {
-        if (video_el.volume > 0) video_el.volume = Math.round((video_el.volume - 0.1)*10)/10;
-      }
       break;
     case 66: // key: b (play previous in sequence)
       if (files.length > 0) {
@@ -347,6 +361,12 @@ addEvent(document, "keydown", function(e) {
       if (files.length > 0) {
         switch_section("player");
         play_video("last");
+      }
+      break;
+      case 77: // m: toggle audio (home screen only)
+      if (current_section == "home") {
+        audioEnabled = !audioEnabled;
+        document.getElementById("audio_status").textContent = audioEnabled ? "(on)" : "(off)";
       }
       break;
       case 78: // key: n (play next in sequence)
