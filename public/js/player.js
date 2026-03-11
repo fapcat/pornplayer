@@ -12,6 +12,8 @@ let active_list_item = null;
 let list_items = [];
 let audioEnabled = false;
 let notification = document.getElementById("notification");
+let seeking = false;
+let startplaying = false;
 
 video_el.autoplay = false;
 video_el.volume = 0;
@@ -64,25 +66,6 @@ function toggle_aspect_ratio() {
   }
 }
 
-function update_files_list() {
-  let files_div = document.getElementById("files_list");
-
-  for (let f = 0; f < files.length; f++) {
-    file_item = document.createElement("li");
-    file_item.classList.add("file_item");
-    file_item.setAttribute("data-id", f);
-    file_item.innerText = files[f];
-    file_item.addEventListener("click", function() {
-      select_list_item(f, true);
-      play_video("specific", f);
-      switch_section("player");
-    });
-    files_div.appendChild(file_item);
-  }
-
-  file_items = document.querySelectorAll("#files_list li");
-  select_list_item(0);
-}
 
 video_el.addEventListener("loadedmetadata", () => {
   play();
@@ -171,24 +154,12 @@ function play_video(method = "random", custom_vid = 0, custom_start = 0) {
 
   select_list_item(get_from_history().id, true);
 
+  video_el.setAttribute('data-video-path', encodeURI(get_from_history().path));
   video_el.src = `http://localhost:3001/video/?f=${encodeURIComponent(get_from_history().path)}`;
   video_el.load();
 
   document.getElementById('info').innerHTML = get_from_history().path;
   progress_show();
-}
-
-function scan() {
-  return fetch("/files")
-    .then(response => {
-      return response.json();
-    })
-    .then(data => {
-      files = data.files;
-      if (files.length > 0) update_files_list();
-      document.getElementById("num_files").innerText = `${files.length}${data.scan_status == "scanning" ? " (Still scanning)" : ""}`;
-      return data;
-    });
 }
 
 function config() {
@@ -292,7 +263,7 @@ addEvent(document, "keydown", function(e) {
           select_list_item(new_item);
         }, 0);
       } else if (current_section == "player" && audioEnabled) {
-        video_el.volume = Math.min(1, Math.round((video_el.volume + 0.1) * 10) / 10);
+        video_el.volume = Math.min(1, Math.round((video_el.volume + 0.05) * 20) / 20);
         show_volume_notification(Math.round(video_el.volume * 100) + "%");
       }
       break;
@@ -304,7 +275,7 @@ addEvent(document, "keydown", function(e) {
           select_list_item(new_item);
         }, 0);
       } else if (current_section == "player" && audioEnabled) {
-        video_el.volume = Math.max(0, Math.round((video_el.volume - 0.1) * 10) / 10);
+        video_el.volume = Math.max(0, Math.round((video_el.volume - 0.05) * 20) / 20);
         show_volume_notification(Math.round(video_el.volume * 100) + "%");
       }
       break;
@@ -316,6 +287,11 @@ addEvent(document, "keydown", function(e) {
       break;
     case 51: // key: 3
       switch_section("player");
+      if (video_el.src && video_el.paused) {
+        video_el.style.display = "block";
+        video_el.play();
+        progress_show();
+      }
       break;
     case 66: // key: b (play previous in sequence)
       if (files.length > 0) {
@@ -336,6 +312,18 @@ addEvent(document, "keydown", function(e) {
       break;
       case 73: // key: i (show info)
       if (current_section == "player") {
+        progress_show();
+      }
+      break;
+      case 37: // left arrow: rewind 10s
+      if (current_section == "player") {
+        video_el.currentTime = Math.max(0, video_el.currentTime - 10);
+        progress_show();
+      }
+      break;
+      case 39: // right arrow: fast forward 10s
+      if (current_section == "player") {
+        video_el.currentTime = Math.min(video_el.duration, video_el.currentTime + 10);
         progress_show();
       }
       break;
@@ -366,6 +354,7 @@ addEvent(document, "keydown", function(e) {
       case 77: // m: toggle audio (home screen only)
       if (current_section == "home") {
         audioEnabled = !audioEnabled;
+        if (audioEnabled) video_el.volume = 0;
         document.getElementById("audio_status").textContent = audioEnabled ? "(on)" : "(off)";
       }
       break;
@@ -429,9 +418,97 @@ function toggleFullscreen(event) {
 	isFullscreen ? document.cancelFullScreen() : element.requestFullScreen();
 }
 
+function getPlaylists() {
+  return fetch("/playlists")
+    .then(response => response.json());
+}
+
+function setPlaylist(name) {
+  return fetch(`/playlist/${name}`)
+    .then(response => response.json())
+    .then(data => {
+      files = data;
+      document.getElementById("num_files").innerText = files.length;
+      if (files.length > 0) update_files_list();
+      postData('/config', { last_playlist_type: 'local', last_playlist_name: name }).then(() => {});
+    });
+}
+
+function getRemotePlaylists() {
+  return fetch("/remote-playlists")
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .catch(err => {
+      console.error("Error fetching remote playlists:", err);
+      return [];
+    });
+}
+
+function setRemotePlaylist(id) {
+  return fetch(`/remote-playlist/${id}`)
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      files = data;
+      document.getElementById("num_files").innerText = files.length;
+      if (files.length > 0) update_files_list();
+      postData('/config', { last_playlist_type: 'remote', last_playlist_id: id }).then(() => {});
+    })
+    .catch(err => {
+      console.error("Error setting remote playlist:", err);
+    });
+}
+
 switch_section(current_section);
 config().then((data) => {
   video_el.style.objectFit = data.aspect_ratio || 'contain';
+  if (data.last_playlist_type === 'local' && data.last_playlist_name) {
+    setPlaylist(data.last_playlist_name);
+  } else if (data.last_playlist_type === 'remote' && data.last_playlist_id) {
+    setRemotePlaylist(data.last_playlist_id);
+  }
 });
 
-scan();
+getPlaylists().then((data) => {
+  let playlist_div = document.getElementById("playlist");
+  for (let f = 0; f < data.length; f++) {
+    let li = document.createElement("li");
+    li.classList.add("file_item");
+    li.innerText = data[f];
+    li.addEventListener("click", () => setPlaylist(data[f]));
+    playlist_div.appendChild(li);
+  }
+});
+
+getRemotePlaylists().then((data) => {
+  let remoteDiv = document.getElementById("remote_playlists");
+  remoteDiv.innerHTML = "";
+  for (let i = 0; i < data.length; i++) {
+    const playlist = data[i];
+    const li = document.createElement("li");
+    li.classList.add("file_item");
+    li.setAttribute("data-id", playlist.id);
+    li.textContent = playlist.title;
+    li.addEventListener("click", () => setRemotePlaylist(playlist.id));
+    remoteDiv.appendChild(li);
+  }
+});
+
+document.getElementById("key_audio_toggle").addEventListener("click", () => {
+  audioEnabled = !audioEnabled;
+  if (audioEnabled) video_el.volume = 0;
+  document.getElementById("audio_status").textContent = audioEnabled ? "(on)" : "(off)";
+});
+
+document.getElementById("key_go_player").addEventListener("click", () => {
+  switch_section("player");
+  if (video_el.src && video_el.paused) {
+    video_el.style.display = "block";
+    video_el.play();
+    progress_show();
+  }
+});

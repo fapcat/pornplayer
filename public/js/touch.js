@@ -30,6 +30,7 @@ mc.on("panstart", (e) => {
     panInfo = {};
 
     curr_time = (video_el.currentTime / video_el.duration) * 100;
+    curr_volume = video_el.volume;
 
     if (e.center.x <= gestureArea.offsetWidth / 2) {
         // left side
@@ -109,6 +110,7 @@ mc.on("panend", (e) => {
     }
 
     seeking = false;
+    adjusting_volume = false;
 });
 
 mc.on("pan", (e) => {
@@ -132,6 +134,18 @@ mc.on("pan", (e) => {
         if (new_time < 0) new_time = 0;
         let progress = document.getElementById("progress");
         progress.style.width = `${new_time}%`;
+    }
+
+    if (
+        (panInfo.startQuadrant == 1 || panInfo.startQuadrant == 4) &&
+        (panInfo.direction === "up" || panInfo.direction === "down") &&
+        audioEnabled
+    ) {
+        panInfo.action = "volume";
+        adjusting_volume = true;
+        new_volume = Math.min(1, Math.max(0, curr_volume - (e.deltaY / gestureArea.offsetHeight)));
+        video_el.volume = new_volume;
+        show_volume_notification(Math.round(new_volume * 100) + "%");
     }
 
     console.log(panInfo);
