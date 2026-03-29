@@ -1,201 +1,122 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const video = document.querySelector("#video_player");
+let _trackingInterval = null;
+let _visibilityHandler = null;
+let _unloadHandler = null;
 
-    if (!video) {
-        console.warn("No video element found on DOMContentLoaded.");
+function initVideoTracker(video, videoHash, endpoint = '/api/v1/video-engagement') {
+    if (!video || !videoHash) {
+        console.warn("initVideoTracker: missing video element or hash.");
         return;
     }
 
-    waitForMetadata(video);
-});
+    if (_trackingInterval) {
+        clearInterval(_trackingInterval);
+        _trackingInterval = null;
+    }
 
-function waitForMetadata(video) {
+    if (_visibilityHandler) {
+        document.removeEventListener('visibilitychange', _visibilityHandler);
+        _visibilityHandler = null;
+    }
+
+    if (_unloadHandler) {
+        window.removeEventListener('beforeunload', _unloadHandler);
+        _unloadHandler = null;
+    }
+
     if (video.readyState >= 1) {
-        initVideoDebuggingAndTracking(video);
+        startTracking(video, videoHash, endpoint);
     } else {
         video.addEventListener("loadedmetadata", () => {
-            initVideoDebuggingAndTracking(video);
+            startTracking(video, videoHash, endpoint);
         });
     }
 }
 
-function sendEventToBackend(eventType) {
-    const video = document.querySelector('#video_player');
-    const videoHash = video.getAttribute('data-video-path');
+function startTracking(video, videoHash, endpoint) {
+    const sessionId = crypto.randomUUID();
+    const minRangeDuration = 2; // seconds — filters scrubbing
+    const fallbackInterval = 60 * 1000; // flush every 60s during long continuous plays
 
-    if (!video || !videoHash) return;
+    let ranges = [];
+    let rangeStart = null;
 
-    const currentTime = video.currentTime;
-
-    fetch('http://10.30.1.177:8008/api/v1/video-engagement/event', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            video_hash: videoHash,
-            event: eventType,
-            time: Math.round(currentTime * 100) / 100 // round to 2 decimals
-        })
-    }).then(res => res.json())
-        .then(data => console.log(`✅ Logged ${eventType} at ${currentTime}s`, data))
-        .catch(err => console.error('❌ Error sending event:', err));
-}
-
-function initVideoDebuggingAndTracking(video) {
-    console.log("✅ Video element found!");
-    const videoFile = video.currentSrc || video.src;
-
-    // Extract the hash from the data attribute on the video element
-    const videoHash = video.getAttribute('data-video-path');
-
-    if (!videoHash) {
-        console.error("⚠️ No video hash found on the video element.");
-        return;
+    function closeRange() {
+        if (rangeStart === null) return;
+        const duration = video.currentTime - rangeStart;
+        if (duration >= minRangeDuration) {
+            ranges.push([rangeStart, video.currentTime]);
+        }
+        rangeStart = null;
     }
 
-    const videoDuration = video.duration;
-    const numSegments = 300;
-    const watchThresholdPercent = 80;
+    function buildPayload() {
+        return JSON.stringify({
+            video_hash: videoHash,
+            session_id: sessionId,
+            ranges: ranges,
+            duration: video.duration,
+        });
+    }
 
-    const segmentDuration = videoDuration / numSegments;
-    const segmentWatchTime = new Array(numSegments).fill(0);
-    const segmentWatchCounts = new Array(numSegments).fill(0);
-
-    let lastTime = null;
-    const updateInterval = 10 * 1000;
-
-    // console.log(`🔎 Tracking video hash: ${videoHash}`);
-    // console.log(`⏱️ Video duration: ${videoDuration.toFixed(2)} seconds`);
-    // console.log(`📏 Segment duration: ${segmentDuration.toFixed(2)} seconds per segment`);
-
-    // // ===== Event Listeners =====
-    // video.addEventListener("play", () => {
-    //     console.log(`▶️ Playing from ${video.currentTime.toFixed(2)}s`);
-    // });
-    //
-    // video.addEventListener("pause", () => {
-    //     console.log(`⏸️ Paused at ${video.currentTime.toFixed(2)}s`);
-    // });
-    //
-    // video.addEventListener("seeking", () => {
-    //     console.log(`🔄 Seeking... moving to ${video.currentTime.toFixed(2)}s`);
-    // });
-    //
-    // video.addEventListener("seeked", () => {
-    //     console.log(`✅ Seek completed. New position: ${video.currentTime.toFixed(2)}s`);
-    // });
-    //
-    // video.addEventListener("waiting", () => {
-    //     console.log("⌛ Buffering...");
-    // });
-    //
-    // video.addEventListener("playing", () => {
-    //     console.log("▶️ Resumed playback after buffering.");
-    // });
-    //
-    // video.addEventListener("ended", () => {
-    //     console.log("🏁 Video ended.");
-    //     sendProgressUpdate();
-    // });
-
-    video.addEventListener("timeupdate", () => {
-        const currentTime = video.currentTime;
-
-        if (lastTime === null) {
-            lastTime = currentTime;
-            return; // First timeupdate, set baseline
+    async function flush() {
+        if (ranges.length === 0) return;
+        const payload = buildPayload();
+        ranges = [];
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload,
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        } catch (error) {
+            console.error("Error sending tracking update:", error);
         }
+    }
 
-        const segmentIndex = Math.floor((currentTime / videoDuration) * numSegments);
+    function flushBeacon() {
+        closeRange();
+        if (ranges.length === 0) return;
+        navigator.sendBeacon(
+            endpoint,
+            new Blob([buildPayload()], { type: 'application/json' })
+        );
+        ranges = [];
+    }
 
-        if (segmentIndex < 0 || segmentIndex >= numSegments) {
-            lastTime = currentTime;
-            return;
-        }
-
-        const deltaTime = currentTime - lastTime;
-
-        if (deltaTime < 0) {
-            console.log(`⏪ Rewind detected. Skipping delta...`);
-            lastTime = currentTime;
-            return;
-        }
-
-        if (deltaTime > segmentDuration * 2) {
-            console.log(`⏩ Large jump detected (seek?). Skipping delta...`);
-            lastTime = currentTime;
-            return;
-        }
-
-        segmentWatchTime[segmentIndex] += deltaTime;
-
-        const requiredWatchTime = segmentDuration * (watchThresholdPercent / 100);
-
-        if (segmentWatchTime[segmentIndex] >= requiredWatchTime) {
-            segmentWatchCounts[segmentIndex]++;
-            console.log(`✅ Segment ${segmentIndex} fully watched ${segmentWatchCounts[segmentIndex]} time(s)`);
-
-            segmentWatchTime[segmentIndex] = 0;
-        }
-
-        lastTime = currentTime;
+    // Start a range when playback actually begins (covers initial play, post-pause, post-seek)
+    video.addEventListener('playing', () => {
+        rangeStart = video.currentTime;
     });
 
+    video.addEventListener('pause', () => {
+        closeRange();
+        flush();
+    });
 
-    // ===== API Call Function =====
-    async function sendProgressUpdate() {
-        const watchedSegments = [];
+    // Close range before the jump, new range starts on 'playing' after seek completes
+    video.addEventListener('seeking', () => {
+        closeRange();
+        flush();
+    });
 
-        segmentWatchCounts.forEach((count, index) => {
-            if (count > 0) {
-                watchedSegments.push({
-                    segment: index,
-                    timesWatched: count,
-                });
-            }
-        });
+    video.addEventListener('ended', () => {
+        closeRange();
+        flush();
+    });
 
-        if (watchedSegments.length === 0) {
-            console.log("⏱️ No new segments watched since last update.");
-            return;
+    _visibilityHandler = () => {
+        if (document.visibilityState === 'hidden') {
+            flushBeacon();
         }
+    };
 
-        console.log(`🚀 Sending progress update for video hash: ${videoHash}`);
-        console.table(watchedSegments);
+    _unloadHandler = () => flushBeacon();
 
-        try {
-            const response = await fetch('http://10.30.1.177:8008/api/v1/video-engagement-pp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // If you have CSRF protection, add the token here:
-                    // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    video_hash: videoHash,
-                    segments: watchedSegments
-                })
-            });
+    document.addEventListener('visibilitychange', _visibilityHandler);
+    window.addEventListener('beforeunload', _unloadHandler);
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            console.log("✅ Progress update sent successfully:", data);
-
-            // Clear counts after successful update to avoid duplicate counts
-            watchedSegments.forEach(({segment}) => {
-                segmentWatchCounts[segment] = 0;
-            });
-
-        } catch (error) {
-            console.error("❌ Error sending progress update:", error);
-        }
-    }
-
-    // Start periodic progress updates
-    setInterval(sendProgressUpdate, updateInterval);
+    _trackingInterval = setInterval(() => {
+        if (ranges.length > 0) flush();
+    }, fallbackInterval);
 }
